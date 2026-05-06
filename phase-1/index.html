@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GymOS — Futuristic Gym Optimization Dashboard</title>
+  <meta name="description" content="AI-powered gym optimization dashboard with real-time occupancy heatmaps, intelligent recommendations, and smart equipment management." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="ambient-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Top Navigation -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-left">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">GymOS</span>
+        <span class="logo-badge">PRO</span>
+      </div>
+      <div class="live-indicator">
+        <span class="pulse-dot"></span>
+        <span>LIVE</span>
+      </div>
+    </div>
+    <div class="topbar-center">
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="date" id="date">---</div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="notif-btn" title="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge-dot">3</span>
+      </button>
+      <button class="icon-btn" title="Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93a10 10 0 0 0 14.14 14.14"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+      <div class="avatar" title="Admin">A</div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="dashboard">
+
+    <!-- ── SECTION 1: KPI Strip ── -->
+    <section class="kpi-strip" aria-label="Key Performance Indicators">
+      <div class="kpi-card" id="kpi-members">
+        <div class="kpi-icon" style="--c:#00f5d4">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value" id="kv-members">247</div>
+          <div class="kpi-label">Active Members</div>
+          <div class="kpi-delta positive">↑ 12% vs yesterday</div>
+        </div>
+        <canvas class="sparkline" id="spark-members" width="80" height="36"></canvas>
+      </div>
+
+      <div class="kpi-card" id="kpi-capacity">
+        <div class="kpi-icon" style="--c:#f72585">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value" id="kv-capacity">68%</div>
+          <div class="kpi-label">Floor Capacity</div>
+          <div class="kpi-delta warning">⚠ Near peak hours</div>
+        </div>
+        <div class="capacity-ring">
+          <svg viewBox="0 0 36 36" class="ring-svg">
+            <circle class="ring-bg" cx="18" cy="18" r="15.9"/>
+            <circle class="ring-fill" cx="18" cy="18" r="15.9" id="capacity-ring" stroke-dasharray="68 32" stroke="#f72585"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="kpi-energy">
+        <div class="kpi-icon" style="--c:#7209b7">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value" id="kv-energy">84 kW</div>
+          <div class="kpi-label">Energy Usage</div>
+          <div class="kpi-delta positive">↓ 8% optimized</div>
+        </div>
+        <canvas class="sparkline" id="spark-energy" width="80" height="36"></canvas>
+      </div>
+
+      <div class="kpi-card" id="kpi-score">
+        <div class="kpi-icon" style="--c:#4cc9f0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value" id="kv-score">92</div>
+          <div class="kpi-label">AI Opt. Score</div>
+          <div class="kpi-delta positive">↑ Excellent</div>
+        </div>
+        <canvas class="sparkline" id="spark-score" width="80" height="36"></canvas>
+      </div>
+    </section>
+
+    <!-- ── SECTION 2: Main Grid ── -->
+    <div class="main-grid">
+
+      <!-- LEFT COLUMN -->
+      <div class="col-left">
+
+        <!-- Heatmap -->
+        <section class="card heatmap-card" aria-label="Floor Occupancy Heatmap">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">🗺</span>
+              Floor Occupancy Heatmap
+            </div>
+            <div class="card-controls">
+              <select class="select-pill" id="floor-select">
+                <option value="1">Floor 1 – Weights</option>
+                <option value="2">Floor 2 – Cardio</option>
+                <option value="3">Floor 3 – Classes</option>
+              </select>
+              <button class="pill-btn active" id="hm-realtime">Live</button>
+              <button class="pill-btn" id="hm-predict">Predict</button>
+            </div>
+          </div>
+
+          <div class="heatmap-wrapper">
+            <canvas id="heatmap-canvas" class="heatmap-canvas"></canvas>
+            <div class="heatmap-legend">
+              <span class="legend-label">Empty</span>
+              <div class="legend-gradient"></div>
+              <span class="legend-label">Full</span>
+            </div>
+          </div>
+
+          <div class="zone-summary" id="zone-summary">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- Hourly Traffic Chart -->
+        <section class="card chart-card" aria-label="Hourly Traffic">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">📈</span>
+              Hourly Traffic
+            </div>
+            <div class="card-controls">
+              <button class="pill-btn active">Today</button>
+              <button class="pill-btn">Week</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="traffic-chart"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="col-right">
+
+        <!-- AI Recommendations -->
+        <section class="card ai-card" aria-label="AI Recommendations">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon ai-brain">🧠</span>
+              AI Recommendations
+            </div>
+            <span class="ai-model-tag">GPT-4o</span>
+          </div>
+          <div class="ai-recs" id="ai-recs">
+            <!-- Populated by JS -->
+          </div>
+          <button class="refresh-btn" id="refresh-ai">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh Insights
+          </button>
+        </section>
+
+        <!-- Equipment Status -->
+        <section class="card equip-card" aria-label="Equipment Status">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">🏋️</span>
+              Equipment Status
+            </div>
+            <span class="status-summary" id="equip-summary">32/35 Online</span>
+          </div>
+          <div class="equip-list" id="equip-list">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- Member Flow Prediction -->
+        <section class="card prediction-card" aria-label="Member Flow Prediction">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="card-icon">🔮</span>
+              Next 3 Hours Forecast
+            </div>
+          </div>
+          <div class="forecast-bars" id="forecast-bars">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: Quick Actions ── -->
+    <section class="quick-actions" aria-label="Quick Actions">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="action-grid">
+        <button class="action-btn" id="qa-lock" data-label="Lock Zone">
+          <div class="action-icon" style="--ac:#f72585">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <span>Lock Zone</span>
+        </button>
+        <button class="action-btn" id="qa-alert" data-label="Send Alert">
+          <div class="action-icon" style="--ac:#ffbe0b">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <span>Send Alert</span>
+        </button>
+        <button class="action-btn" id="qa-ac" data-label="Adjust A/C">
+          <div class="action-icon" style="--ac:#4cc9f0">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><path d="M2 12h20"/><path d="M20 7 12 12 4 7M4 17l8-5 8 5"/></svg>
+          </div>
+          <span>Adjust A/C</span>
+        </button>
+        <button class="action-btn" id="qa-lights" data-label="Smart Lights">
+          <div class="action-icon" style="--ac:#f8961e">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="3"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/><circle cx="12" cy="12" r="5"/></svg>
+          </div>
+          <span>Smart Lights</span>
+        </button>
+        <button class="action-btn" id="qa-trainer" data-label="Assign Trainer">
+          <div class="action-icon" style="--ac:#00f5d4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span>Assign Trainer</span>
+        </button>
+        <button class="action-btn" id="qa-report" data-label="Export Report">
+          <div class="action-icon" style="--ac:#7209b7">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <span>Export Report</span>
+        </button>
+        <button class="action-btn" id="qa-clean" data-label="Schedule Clean">
+          <div class="action-icon" style="--ac:#3a86ff">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <span>Schedule Clean</span>
+        </button>
+        <button class="action-btn" id="qa-emergency" data-label="Emergency">
+          <div class="action-icon" style="--ac:#ef233c">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <span>Emergency</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+    <button class="mnav-btn active" data-tab="dashboard">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="mnav-btn" data-tab="heatmap">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Heatmap</span>
+    </button>
+    <button class="mnav-btn" data-tab="ai">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/><path d="M12 8v4l3 3"/></svg>
+      <span>AI Insights</span>
+    </button>
+    <button class="mnav-btn" data-tab="actions">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span>Actions</span>
+    </button>
+  </nav>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close">✕</button>
+      <div class="modal-content" id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

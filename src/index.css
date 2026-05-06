@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+/* ─── Custom Theme Tokens (Tailwind v4 CSS-first) ─────────────────────── */
+@theme {
+  --color-background: #0B0F14;
+  --color-card:       #131A22;
+  --color-accent:     #00FF9D;
+  --color-warning:    #FFB020;
+  --color-danger:     #FF4D4D;
+  --color-text:       #F5F7FA;
+  --color-muted:      #6B7280;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --animate-float:       float 6s ease-in-out infinite;
+  --animate-pulse-glow:  pulseGlow 2s ease-in-out infinite;
+  --animate-shimmer:     shimmer 1.5s linear infinite;
+}
+
+/* ─── Keyframes ───────────────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0);     }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1;   box-shadow: 0 0 10px rgba(0,255,157,0.2); }
+  50%       { opacity: 0.7; box-shadow: 0 0 25px rgba(0,255,157,0.5); }
+}
+
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%);  }
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ─── Utility Classes ─────────────────────────────────────────────────── */
+.glass-card {
+  background-color: color-mix(in srgb, var(--color-card) 80%, transparent);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: var(--color-background);
+  font-weight: 700;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-primary:hover {
+  background-color: color-mix(in srgb, var(--color-accent) 90%, white);
+  box-shadow: 0 0 20px rgba(0,255,157,0.35);
+}
+
+.btn-primary:active { transform: scale(0.97); }
+
+.btn-secondary {
+  background-color: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--color-text);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-secondary:hover { background-color: rgba(255,255,255,0.1); }
+.btn-secondary:active { transform: scale(0.97); }
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-accent), #60a5fa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
