@@ -48,7 +48,7 @@ export const useGymStore = create((set) => ({
       user: complaint.user || 'Anonymous',
       title: complaint.title,
       detail: complaint.detail,
-      type: complaint.type || 'general',
+      type: complaint.type || 'generalcomplaints',
       status: 'open',
       date: new Date().toISOString().split('T')[0],
     };

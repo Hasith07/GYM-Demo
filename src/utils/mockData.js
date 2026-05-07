@@ -102,7 +102,7 @@ export const ADMIN_STATS = [
 ];
 
 // ─── USER COMPLAINTS ────────────────────────────────────────────────────────
-// type: 'maintenance' → routed to staff | 'general' → admin only
+// type: 'maintenance' → routed to staff | 'generalcomplaints' → admin only
 export const USER_COMPLAINTS = [
   {
     id: 1,
@@ -136,7 +136,7 @@ export const USER_COMPLAINTS = [
     user: 'Divya R.',
     title: 'Booking system not confirming slots',
     detail: 'I booked a slot for 6 PM but received no confirmation email.',
-    type: 'general',
+    type: 'generalcomplaints',
     status: 'open',
     date: '2026-05-06',
   },
@@ -145,7 +145,7 @@ export const USER_COMPLAINTS = [
     user: 'Karthik S.',
     title: 'Insufficient dumbbells',
     detail: 'The gym lacks dumbbells in the 20–30 kg range. Please procure more.',
-    type: 'general',
+    type: 'generalcomplaints',
     status: 'resolved',
     date: '2026-05-03',
   },

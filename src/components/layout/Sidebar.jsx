@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, LayoutDashboard, Settings, Users, Wrench, Menu, X, Dumbbell } from 'lucide-react';
+import { Activity, LayoutDashboard, Users, Wrench, Menu, X, Dumbbell } from 'lucide-react';
 import { useGymStore } from '../../hooks/useGymStore';
 
 const Sidebar = ({ isMobileOpen, setMobileOpen }) => {
@@ -104,11 +104,7 @@ const Sidebar = ({ isMobileOpen, setMobileOpen }) => {
 
       <div className="p-4 border-t border-white/5">
         <div className="flex items-center justify-between gap-4 px-4 py-3 w-full rounded-xl text-muted">
-          <div className="flex items-center gap-4">
-            <Settings size={20} />
-            {(!isCollapsed || isMobileOpen) && <span className="opacity-60">Settings (coming soon)</span>}
-          </div>
-          <button onClick={logout} className="text-sm text-muted hover:text-white">Logout</button>
+          <button onClick={logout} className="text-sm text-muted hover:text-white ml-auto">Logout</button>
         </div>
       </div>
     </div>

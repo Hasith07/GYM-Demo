@@ -47,7 +47,7 @@ const StudentDashboard = () => {
   const [suggestion, setSuggestion]       = useState(null);
 
   // Complaint state (uses shared store)
-  const [complaint, setComplaint] = useState({ title: '', detail: '', type: 'general' });
+  const [complaint, setComplaint] = useState({ title: '', detail: '', type: 'generalcomplaints' });
   const [submitted, setSubmitted] = useState(false);
   const addComplaint = useGymStore(state => state.addComplaint);
   const clearComplaints = useGymStore(state => state.clearComplaints);
@@ -98,7 +98,7 @@ const StudentDashboard = () => {
     if (!complaint.title.trim() || !complaint.detail.trim()) return;
     addComplaint({ user: 'You', ...complaint });
     const isMaintenance = complaint.type === 'maintenance';
-    setComplaint({ title: '', detail: '', type: 'general' });
+    setComplaint({ title: '', detail: '', type: 'generalcomplaints' });
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
   };
@@ -344,7 +344,7 @@ const StudentDashboard = () => {
                 onChange={e => setComplaint(p => ({ ...p, type: e.target.value }))}
                 className="w-full bg-[#1a1a2e] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-text focus:outline-none focus:border-accent/50 transition-all"
               >
-                <option value="general">General Feedback</option>
+                <option value="generalcomplaints">General Complaints</option>
                 <option value="maintenance">Maintenance Issue</option>
               </select>
             </div>
