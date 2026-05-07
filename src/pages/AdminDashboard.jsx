@@ -8,7 +8,9 @@ import AnimatedPage from '../components/common/AnimatedPage';
 import GlassCard     from '../components/common/GlassCard';
 import StatCard       from '../components/common/StatCard';
 import HeatmapCard    from '../components/dashboard/HeatmapCard';
-import { ADMIN_STATS, WEEKLY_TRAFFIC, MAINTENANCE_LOGS } from '../utils/mockData';
+import { ADMIN_STATS, WEEKLY_TRAFFIC } from '../utils/mockData';
+import { useGymStore } from '../hooks/useGymStore';
+import { useNavigate } from 'react-router-dom';
 
 // ─── Custom tooltip ────────────────────────────────────────────────────────
 const CustomTooltip = ({ active, payload, label }) => {
@@ -28,6 +30,10 @@ const statusStyle = {
 };
 
 const AdminDashboard = () => {
+  const complaints = useGymStore(state => state.complaints);
+  const requirements = useGymStore(state => state.requirements);
+  const maintenanceLogs = useGymStore(state => state.maintenanceLogs);
+  const navigate = useNavigate();
   return (
     <AnimatedPage className="space-y-6 max-w-7xl mx-auto pb-20 md:pb-0">
 
@@ -97,7 +103,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {MAINTENANCE_LOGS.map((log, i) => {
+              {maintenanceLogs.map((log, i) => {
                 const s = statusStyle[log.status];
                 return (
                   <motion.tr
@@ -121,6 +127,33 @@ const AdminDashboard = () => {
               })}
             </tbody>
           </table>
+        </div>
+      </GlassCard>
+
+      {/* User Complaints */}
+      <GlassCard delay={0.5} className="p-6">
+        <h3 className="font-semibold mb-5 flex items-center gap-2">
+          <AlertTriangle size={18} className="text-danger" /> User Complaints
+        </h3>
+        <div className="space-y-3">
+          {complaints && complaints.length > 0 ? (
+            complaints.map((c, i) => (
+              <div key={c.id} className="p-3 bg-white/[0.03] border border-white/5 rounded-xl flex items-start gap-3">
+                <div className="flex-1">
+                  <p className="font-medium text-text">{c.title} <span className="text-xs text-muted">by {c.user}</span></p>
+                  <p className="text-xs text-muted mt-1">{c.detail}</p>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${c.type === 'maintenance' ? 'bg-warning/10 text-warning' : 'bg-accent/10 text-accent'}`}>{c.type}</span>
+                  {c.type === 'maintenance' && (
+                    <button onClick={() => navigate('/dashboard/staff')} className="text-sm text-muted underline">Send to Staff</button>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-xs text-muted">No complaints reported.</p>
+          )}
         </div>
       </GlassCard>
 

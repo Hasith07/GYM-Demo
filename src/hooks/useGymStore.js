@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { EQUIPMENT, PEAK_HOURS, AI_RECOMMENDATIONS, NOTIFICATIONS, MAINTENANCE_LOGS, USER_COMPLAINTS, GYM_REQUIREMENTS } from '../utils/mockData';
 
 // Helper to generate random numbers
 const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -6,49 +7,94 @@ const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 export const useGymStore = create((set) => ({
   occupancy: 68,
   trend: 'increasing',
-  
-  // Real-time equipment status
-  equipment: [
-    { id: 1, name: 'Treadmills', total: 15, available: 3, status: 'high-demand' },
-    { id: 2, name: 'Squat Racks', total: 8, available: 0, status: 'full' },
-    { id: 3, name: 'Bench Press', total: 10, available: 2, status: 'high-demand' },
-    { id: 4, name: 'Cable Machines', total: 6, available: 4, status: 'available' },
-    { id: 5, name: 'Dumbbell Area', total: 1, available: 1, status: 'crowded' }
-  ],
 
-  // Peak hour analytics data
-  peakHours: [
-    { time: '6 AM', users: 30 },
-    { time: '9 AM', users: 80 },
-    { time: '12 PM', users: 45 },
-    { time: '3 PM', users: 60 },
-    { time: '6 PM', users: 120 },
-    { time: '9 PM', users: 85 },
-    { time: '11 PM', users: 20 },
-  ],
+  // Real-time equipment status (seeded from mock data)
+  equipment: EQUIPMENT,
+
+  // Peak hour analytics
+  peakHours: PEAK_HOURS,
 
   // AI Recommendations
-  recommendations: [
-    { id: 1, title: 'Optimal Workout Time', desc: 'Wait 45 minutes for the Squat Racks to free up. Occupancy is dropping.', type: 'timing' },
-    { id: 2, title: 'Zone Suggestion', desc: 'The Cardio zone is currently 80% empty. Great time for a run!', type: 'zone' }
-  ],
+  recommendations: AI_RECOMMENDATIONS,
 
   // Notifications
-  notifications: [
-    { id: 1, text: 'Treadmill #4 is under maintenance.', time: '10m ago', read: false },
-    { id: 2, text: 'New yoga class starts in 30 mins.', time: '1h ago', read: true }
-  ],
+  notifications: NOTIFICATIONS,
 
-  // Simulation action to mimic live updates
+  // Shared complaints and maintenance logs
+  complaints: USER_COMPLAINTS || [],
+  maintenanceLogs: MAINTENANCE_LOGS || [],
+  requirements: GYM_REQUIREMENTS || [],
+  // Current role (student | staff | admin)
+  role: (() => {
+    try {
+      const v = localStorage.getItem('gym_role');
+      return v && v !== 'null' ? v : null;
+    } catch (e) {
+      return null;
+    }
+  })(),
+  setRole: (r) => set(() => {
+    try {
+      if (r === null) localStorage.removeItem('gym_role');
+      else localStorage.setItem('gym_role', r);
+    } catch (e) {}
+    return { role: r };
+  }),
+
+  // Add a user complaint; if maintenance, create a maintenance log as well
+  addComplaint: (complaint) => set((state) => {
+    const newItem = {
+      id: Date.now(),
+      user: complaint.user || 'Anonymous',
+      title: complaint.title,
+      detail: complaint.detail,
+      type: complaint.type || 'general',
+      status: 'open',
+      date: new Date().toISOString().split('T')[0],
+    };
+
+    const updated = [newItem, ...state.complaints];
+
+    // If maintenance, also add to maintenanceLogs
+    if (newItem.type === 'maintenance') {
+      const mLog = {
+        id: Date.now() + 1,
+        equipment: newItem.title,
+        issue: newItem.detail,
+        status: 'pending',
+        assignee: 'Unassigned',
+        date: newItem.date,
+      };
+      return { complaints: updated, maintenanceLogs: [mLog, ...state.maintenanceLogs] };
+    }
+
+    return { complaints: updated };
+  }),
+
+  // Resolve a maintenance log by id
+  resolveMaintenance: (id) => set((state) => ({
+    maintenanceLogs: state.maintenanceLogs.map(m => m.id === id ? { ...m, status: 'resolved' } : m)
+  })),
+
+  // Simulation action to mimic live updates for occupancy/equipment
   simulateLiveUpdates: () => {
     setInterval(() => {
       set((state) => {
-        const newOccupancy = state.occupancy + random(-2, 2);
+        // Realistic occupancy: fluctuates less often and by smaller amounts
+        const shouldChangeOcc = Math.random() > 0.8;
+        const occChange = shouldChangeOcc ? (Math.random() > 0.5 ? 1 : -1) : 0;
+        const newOccupancy = state.occupancy + occChange;
         const boundedOccupancy = Math.max(10, Math.min(100, newOccupancy));
         
+        let newTrend = state.trend;
+        if (occChange > 0) newTrend = 'increasing';
+        else if (occChange < 0) newTrend = 'decreasing';
+
         const newEquipment = state.equipment.map(eq => {
-          if (Math.random() > 0.7) {
-            const avail = Math.max(0, Math.min(eq.total, eq.available + random(-1, 1)));
+          // Equipment availability also changes less frequently
+          if (Math.random() > 0.85) {
+            const availChange = Math.random() > 0.5 ? 1 : -1;
+            const avail = Math.max(0, Math.min(eq.total, eq.available + availChange));
             let status = 'available';
             if (avail === 0) status = 'full';
             else if (avail <= 2) status = 'high-demand';
@@ -58,12 +104,12 @@ export const useGymStore = create((set) => ({
           return eq;
         });
 
-        return { 
+        return {
           occupancy: boundedOccupancy,
-          trend: newOccupancy > state.occupancy ? 'increasing' : 'decreasing',
+          trend: newTrend,
           equipment: newEquipment
         };
       });
-    }, 5000); // Update every 5 seconds
+    }, 15000); // Update every 15 seconds to be more realistic
   }
 }));

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useGymStore } from '../hooks/useGymStore';
 import { Dumbbell, ShieldCheck, Wrench, ChevronRight } from 'lucide-react';
 
 const roles = [
@@ -37,6 +38,7 @@ const roles = [
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const setRole = useGymStore(state => state.setRole);
 
   return (
     <div className="min-h-screen bg-background text-text font-sans flex flex-col items-center justify-center px-4 relative overflow-hidden">
@@ -88,7 +90,7 @@ const LandingPage = () => {
               transition={{ delay: 0.15 + i * 0.1, duration: 0.5 }}
               whileHover={{ y: -6, boxShadow: `0 24px 48px -16px ${color}30` }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => navigate(path)}
+              onClick={() => { setRole(id); navigate(path); }}
               className="group relative text-left rounded-2xl p-6 flex flex-col gap-4 cursor-pointer transition-all duration-300 border"
               style={{
                 background: colorDim,

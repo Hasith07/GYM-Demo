@@ -4,7 +4,8 @@ import { CheckCircle2, Circle, AlertTriangle, Wrench, ClipboardList } from 'luci
 import AnimatedPage from '../components/common/AnimatedPage';
 import GlassCard     from '../components/common/GlassCard';
 import StatCard       from '../components/common/StatCard';
-import { STAFF_TASKS, MAINTENANCE_LOGS, EQUIPMENT } from '../utils/mockData';
+import { STAFF_TASKS, EQUIPMENT } from '../utils/mockData';
+import { useGymStore } from '../hooks/useGymStore';
 
 const priorityStyle = {
   high:   { bg: 'bg-danger/10',  text: 'text-danger',  label: 'High'   },
@@ -21,6 +22,8 @@ const eqStatusColor = {
 
 const StaffDashboard = () => {
   const [tasks, setTasks] = useState(STAFF_TASKS);
+  const maintenanceLogs = useGymStore(state => state.maintenanceLogs);
+  const resolveMaintenance = useGymStore(state => state.resolveMaintenance);
 
   const toggleTask = (id) =>
     setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
@@ -39,11 +42,11 @@ const StaffDashboard = () => {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-        <StatCard label="Tasks Completed"  value={`${done}/${total}`} delta={`${pct}% done`} positive icon={ClipboardList} accentColor="#00FF9D" delay={0.1} />
-        <StatCard label="Pending Repairs"  value={MAINTENANCE_LOGS.filter(l => l.status === 'pending').length} delta="Need attention" positive={false} icon={Wrench} accentColor="#FF4D4D" delay={0.2} />
-        <StatCard label="Equipment Online" value={`${EQUIPMENT.filter(e => e.available > 0).length}/${EQUIPMENT.length}`} delta="Tracked live" positive icon={AlertTriangle} accentColor="#4CC9F0" delay={0.3} />
-      </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+            <StatCard label="Tasks Completed"  value={`${done}/${total}`} delta={`${pct}% done`} positive icon={ClipboardList} accentColor="#00FF9D" delay={0.1} />
+            <StatCard label="Pending Repairs"  value={maintenanceLogs.filter(l => l.status === 'pending').length} delta="Need attention" positive={false} icon={Wrench} accentColor="#FF4D4D" delay={0.2} />
+            <StatCard label="Equipment Online" value={`${EQUIPMENT.filter(e => e.available > 0).length}/${EQUIPMENT.length}`} delta="Tracked live" positive icon={AlertTriangle} accentColor="#4CC9F0" delay={0.3} />
+          </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
@@ -142,23 +145,30 @@ const StaffDashboard = () => {
           <AlertTriangle size={18} className="text-danger" /> Open Maintenance Requests
         </h3>
         <div className="space-y-3">
-          {MAINTENANCE_LOGS.filter(l => l.status !== 'resolved').map((log, i) => (
-            <motion.div
-              key={log.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.55 + i * 0.08 }}
-              className="flex items-center justify-between p-4 bg-white/[0.03] border border-white/5 rounded-xl hover:bg-white/[0.05] transition-colors"
-            >
-              <div>
-                <p className="text-sm font-semibold text-text">{log.equipment}</p>
-                <p className="text-xs text-muted mt-0.5">{log.issue} · {log.assignee}</p>
-              </div>
-              <span className={`text-xs px-3 py-1 rounded-full font-semibold ${log.status === 'in-progress' ? 'bg-warning/10 text-warning' : 'bg-danger/10 text-danger'}`}>
-                {log.status === 'in-progress' ? 'In Progress' : 'Pending'}
-              </span>
-            </motion.div>
-          ))}
+          {maintenanceLogs && maintenanceLogs.filter(l => l.status !== 'resolved').length > 0 ? (
+            maintenanceLogs.filter(l => l.status !== 'resolved').map((log, i) => (
+              <motion.div
+                key={log.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.55 + i * 0.08 }}
+                className="flex items-center justify-between p-4 bg-white/[0.03] border border-white/5 rounded-xl hover:bg-white/[0.05] transition-colors"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-text">{log.equipment}</p>
+                  <p className="text-xs text-muted mt-0.5">{log.issue} · {log.assignee}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => resolveMaintenance(log.id)} className="px-3 py-1 rounded-full text-xs bg-accent/10 text-accent">Mark Resolved</button>
+                  <span className={`text-xs px-3 py-1 rounded-full font-semibold ${log.status === 'in-progress' ? 'bg-warning/10 text-warning' : 'bg-danger/10 text-danger'}`}>
+                    {log.status === 'in-progress' ? 'In Progress' : 'Pending'}
+                  </span>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <p className="text-xs text-muted">No open maintenance requests.</p>
+          )}
         </div>
       </GlassCard>
 

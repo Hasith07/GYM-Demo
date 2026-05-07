@@ -1,16 +1,38 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, LayoutDashboard, Settings, Users, Wrench, Menu, X, Dumbbell } from 'lucide-react';
+import { useGymStore } from '../../hooks/useGymStore';
 
 const Sidebar = ({ isMobileOpen, setMobileOpen }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const navItems = [
-    { name: 'Student View', path: '/dashboard/student', icon: Activity },
-    { name: 'Admin Portal', path: '/dashboard/admin', icon: LayoutDashboard },
-    { name: 'Staff Panel', path: '/dashboard/staff', icon: Wrench },
-  ];
+  const currentRole = useGymStore(state => state.role);
+  const setRole = useGymStore(state => state.setRole);
+  const navigate = useNavigate();
+
+  const logout = () => {
+    setRole(null);
+    navigate('/');
+  };
+
+  let navItems = [];
+  if (!currentRole) {
+    // no role selected: show all options
+    navItems = [
+      { name: 'Student View', path: '/dashboard/student', icon: Activity },
+      { name: 'Admin Portal', path: '/dashboard/admin', icon: LayoutDashboard },
+      { name: 'Staff Panel', path: '/dashboard/staff', icon: Wrench },
+    ];
+  } else if (currentRole === 'student') {
+    navItems = [ { name: 'Student View', path: '/dashboard/student', icon: Activity } ];
+  } else if (currentRole === 'admin') {
+    navItems = [ { name: 'Admin Portal', path: '/dashboard/admin', icon: LayoutDashboard } ];
+  } else if (currentRole === 'staff') {
+    navItems = [ { name: 'Staff Panel', path: '/dashboard/staff', icon: Wrench } ];
+  } else {
+    navItems = [ { name: 'Student View', path: '/dashboard/student', icon: Activity } ];
+  }
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-card/90 backdrop-blur-2xl border-r border-white/5 relative z-50">
@@ -81,10 +103,13 @@ const Sidebar = ({ isMobileOpen, setMobileOpen }) => {
       </nav>
 
       <div className="p-4 border-t border-white/5">
-        <button className="flex items-center gap-4 px-4 py-3 w-full rounded-xl text-muted hover:text-white hover:bg-white/5 transition-all">
-          <Settings size={20} />
-          {(!isCollapsed || isMobileOpen) && <span>Settings</span>}
-        </button>
+        <div className="flex items-center justify-between gap-4 px-4 py-3 w-full rounded-xl text-muted">
+          <div className="flex items-center gap-4">
+            <Settings size={20} />
+            {(!isCollapsed || isMobileOpen) && <span className="opacity-60">Settings (coming soon)</span>}
+          </div>
+          <button onClick={logout} className="text-sm text-muted hover:text-white">Logout</button>
+        </div>
       </div>
     </div>
   );

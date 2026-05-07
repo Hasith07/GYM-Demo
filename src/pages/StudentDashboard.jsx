@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useGymStore } from '../hooks/useGymStore';
+import { useNavigate } from 'react-router-dom';
 import AnimatedPage from '../components/common/AnimatedPage';
 import GlassCard from '../components/common/GlassCard';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
@@ -45,10 +46,12 @@ const StudentDashboard = () => {
   const [selectedFocus, setSelectedFocus] = useState(null);
   const [suggestion, setSuggestion]       = useState(null);
 
-  // Complaint state
-  const [complaint, setComplaint]       = useState({ title: '', detail: '', type: 'general' });
-  const [submitted, setSubmitted]       = useState(false);
-  const [complaints, setComplaints]     = useState([]);
+  // Complaint state (uses shared store)
+  const [complaint, setComplaint] = useState({ title: '', detail: '', type: 'general' });
+  const [submitted, setSubmitted] = useState(false);
+  const addComplaint = useGymStore(state => state.addComplaint);
+  const complaints = useGymStore(state => state.complaints);
+  const navigate = useNavigate();
 
   const occColor = occupancy > 80 ? 'text-danger' : occupancy > 60 ? 'text-warning' : 'text-accent';
 
@@ -69,13 +72,14 @@ const StudentDashboard = () => {
   const handleComplaintSubmit = (e) => {
     e.preventDefault();
     if (!complaint.title.trim() || !complaint.detail.trim()) return;
-    setComplaints(prev => [
-      { id: Date.now(), ...complaint, date: new Date().toLocaleDateString(), status: 'open' },
-      ...prev,
-    ]);
+    addComplaint({ user: 'You', ...complaint });
+    const isMaintenance = complaint.type === 'maintenance';
     setComplaint({ title: '', detail: '', type: 'general' });
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
+    if (isMaintenance) {
+      navigate('/dashboard/staff');
+    }
   };
 
   return (
@@ -361,14 +365,14 @@ const StudentDashboard = () => {
         </form>
 
         {/* Previous complaints */}
-        {complaints.length > 0 && (
+        {complaints && complaints.length > 0 && (
           <div className="mt-6 space-y-2">
             <p className="text-xs text-muted uppercase font-semibold tracking-wide">Your Submissions</p>
             {complaints.map(c => (
               <div key={c.id} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/5 text-sm">
                 <span className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${c.type === 'maintenance' ? 'bg-warning' : 'bg-accent'}`} />
                 <div>
-                  <p className="font-medium text-text">{c.title}</p>
+                  <p className="font-medium text-text">{c.title} <span className="text-xs text-muted">by {c.user}</span></p>
                   <p className="text-xs text-muted mt-0.5">{c.detail}</p>
                 </div>
                 <span className="ml-auto text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">Submitted</span>

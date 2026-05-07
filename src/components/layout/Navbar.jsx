@@ -73,11 +73,11 @@ const Navbar = ({ onMenuClick }) => {
             <p className="text-sm font-medium text-text">Alex Student</p>
             <p className="text-xs text-muted">Premium Member</p>
           </div>
-          <button className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-blue-500 p-[2px]">
-            <div className="w-full h-full bg-card rounded-full flex items-center justify-center border border-transparent hover:border-white/20 transition-colors">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-blue-500 p-[2px]" aria-hidden>
+            <div className="w-full h-full bg-card rounded-full flex items-center justify-center border border-transparent">
               <User size={18} className="text-white" />
             </div>
-          </button>
+          </div>
         </div>
       </div>
     </header>
