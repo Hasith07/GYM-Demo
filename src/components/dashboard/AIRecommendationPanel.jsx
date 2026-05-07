@@ -21,7 +21,7 @@ const AIRecommendationPanel = () => {
           className={`p-4 bg-white/[0.03] border border-white/5 border-l-4 ${priorityBorder[rec.priority]} rounded-xl cursor-default`}
         >
           <div className="flex items-start gap-3">
-            <span className="text-2xl leading-none mt-0.5">{rec.icon}</span>
+            <div className="mt-0.5"><rec.icon size={22} className="text-accent" /></div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h4 className="font-semibold text-sm text-text">{rec.title}</h4>
@@ -42,7 +42,7 @@ const AIRecommendationPanel = () => {
         className="flex items-center gap-2 justify-center pt-2 text-xs text-muted"
       >
         <Zap size={12} className="text-accent animate-pulse" />
-        Powered by GymOS AI Engine
+        Powered by OptiGYM AI Engine
       </motion.div>
     </div>
   );

@@ -76,6 +76,12 @@ export const useGymStore = create((set) => ({
     maintenanceLogs: state.maintenanceLogs.map(m => m.id === id ? { ...m, status: 'resolved' } : m)
   })),
 
+  // Clear all complaints and logs
+  clearComplaints: () => set(() => ({ 
+    complaints: [],
+    maintenanceLogs: [] 
+  })),
+
   // Simulation action to mimic live updates for occupancy/equipment
   simulateLiveUpdates: () => {
     setInterval(() => {

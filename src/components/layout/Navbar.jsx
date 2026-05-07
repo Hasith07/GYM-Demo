@@ -69,10 +69,6 @@ const Navbar = ({ onMenuClick }) => {
 
         {/* Profile */}
         <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-          <div className="hidden md:block text-right">
-            <p className="text-sm font-medium text-text">Alex Student</p>
-            <p className="text-xs text-muted">Premium Member</p>
-          </div>
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-blue-500 p-[2px]" aria-hidden>
             <div className="w-full h-full bg-card rounded-full flex items-center justify-center border border-transparent">
               <User size={18} className="text-white" />

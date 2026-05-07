@@ -1,5 +1,6 @@
 // ─── MOCK DATA ─────────────────────────────────────────────────────────────
 // Single source of truth for all static/simulated data across dashboards.
+import { Clock, Activity, BarChart2, Dumbbell, Zap, Target, Users } from 'lucide-react';
 
 export const EQUIPMENT = [
   { id: 1, name: 'Treadmills',       total: 15, available: 3, status: 'high-demand' },
@@ -37,7 +38,7 @@ export const WEEKLY_TRAFFIC = [
 export const AI_RECOMMENDATIONS = [
   {
     id: 1,
-    icon: '⏰',
+    icon: Clock,
     title: 'Best Time to Visit',
     desc: 'Today at 10 AM, occupancy is predicted to drop to 35%. Perfect window for a peaceful workout.',
     tag: 'Timing',
@@ -45,7 +46,7 @@ export const AI_RECOMMENDATIONS = [
   },
   {
     id: 2,
-    icon: '🏃',
+    icon: Activity,
     title: 'Cardio Zone Open',
     desc: 'The cardio zone is currently at 20% capacity. All treadmills and ellipticals are available.',
     tag: 'Zone',
@@ -53,7 +54,7 @@ export const AI_RECOMMENDATIONS = [
   },
   {
     id: 3,
-    icon: '📊',
+    icon: BarChart2,
     title: 'Crowd Prediction',
     desc: 'Expect peak crowd at 6 PM today (est. 130 users). Consider shifting your session by 2 hours.',
     tag: 'Forecast',
@@ -161,11 +162,11 @@ export const GYM_REQUIREMENTS = [
 
 // ─── WORKOUT FOCUS OPTIONS ──────────────────────────────────────────────────
 export const WORKOUT_FOCUSES = [
-  { id: 'chest',    label: 'Chest Day',       icon: '💪', equipment: ['Bench Press', 'Cable Machines', 'Dumbbell Area'] },
-  { id: 'legs',     label: 'Leg Day',         icon: '🦵', equipment: ['Squat Racks', 'Leg Press', 'Cable Machines'] },
-  { id: 'back',     label: 'Back & Lats',     icon: '🏋️', equipment: ['Pull-Up Stations', 'Cable Machines', 'Rowing Machines'] },
-  { id: 'cardio',   label: 'Cardio',          icon: '🏃', equipment: ['Treadmills', 'Rowing Machines'] },
-  { id: 'arms',     label: 'Arms',            icon: '🤜', equipment: ['Dumbbell Area', 'Cable Machines', 'Bench Press'] },
-  { id: 'full',     label: 'Full Body',       icon: '⚡', equipment: ['Squat Racks', 'Bench Press', 'Pull-Up Stations', 'Cable Machines'] },
-  { id: 'specific', label: 'Specific Equipment', icon: '🎯', equipment: [] },
+  { id: 'chest',    label: 'Chest Day',       icon: Dumbbell, equipment: ['Bench Press', 'Cable Machines', 'Dumbbell Area'] },
+  { id: 'legs',     label: 'Leg Day',         icon: Activity, equipment: ['Squat Racks', 'Leg Press', 'Cable Machines'] },
+  { id: 'back',     label: 'Back & Lats',     icon: Dumbbell, equipment: ['Pull-Up Stations', 'Cable Machines', 'Rowing Machines'] },
+  { id: 'cardio',   label: 'Cardio',          icon: Activity, equipment: ['Treadmills', 'Rowing Machines'] },
+  { id: 'arms',     label: 'Arms',            icon: Target, equipment: ['Dumbbell Area', 'Cable Machines', 'Bench Press'] },
+  { id: 'full',     label: 'Full Body',       icon: Zap, equipment: ['Squat Racks', 'Bench Press', 'Pull-Up Stations', 'Cable Machines'] },
+  { id: 'specific', label: 'Specific Equipment', icon: Target, equipment: [] },
 ];

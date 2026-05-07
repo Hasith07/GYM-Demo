@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AnimatedPage from '../components/common/AnimatedPage';
 import GlassCard from '../components/common/GlassCard';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { Activity, Users, Clock, Zap, AlertTriangle, CheckCircle2, Dumbbell, Send, MessageSquare } from 'lucide-react';
+import { Activity, Users, Clock, Zap, AlertTriangle, CheckCircle2, Dumbbell, Send, MessageSquare, RotateCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PEAK_HOURS, EQUIPMENT, WORKOUT_FOCUSES } from '../utils/mockData';
 
@@ -50,6 +50,7 @@ const StudentDashboard = () => {
   const [complaint, setComplaint] = useState({ title: '', detail: '', type: 'general' });
   const [submitted, setSubmitted] = useState(false);
   const addComplaint = useGymStore(state => state.addComplaint);
+  const clearComplaints = useGymStore(state => state.clearComplaints);
   const complaints = useGymStore(state => state.complaints);
   const navigate = useNavigate();
 
@@ -57,16 +58,39 @@ const StudentDashboard = () => {
 
   const handlePlan = () => {
     const focus   = WORKOUT_FOCUSES.find(f => f.id === selectedFocus);
-    const times   = getBestTimes(selectedFocus);
     const eqList  = focus?.equipment ?? [];
+    const selectedHourData = PEAK_HOURS.find(h => h.time === selectedTime);
+    const usersAtTime = selectedHourData?.users ?? 0;
 
     // find availability for each piece of equipment
     const eqAvailability = eqList.map(name => {
       const found = EQUIPMENT.find(e => e.name === name);
-      return found ? { name: found.name, available: found.available, total: found.total, status: found.status } : null;
+      if (found) {
+         let simulatedAvailable = found.total;
+         if (usersAtTime > 80) simulatedAvailable = Math.max(0, Math.floor(found.total * 0.2));
+         else if (usersAtTime > 50) simulatedAvailable = Math.max(0, Math.floor(found.total * 0.5));
+         else simulatedAvailable = Math.max(0, Math.floor(found.total * 0.8));
+         
+         let status = 'available';
+         if (simulatedAvailable === 0) status = 'full';
+         else if (simulatedAvailable <= 2) status = 'high-demand';
+         else if (simulatedAvailable <= found.total / 2) status = 'crowded';
+         
+         return { name: found.name, available: simulatedAvailable, total: found.total, status };
+      }
+      return null;
     }).filter(Boolean);
 
-    setSuggestion({ times, eqAvailability, focus });
+    let recommendationText = '';
+    if (usersAtTime > 80) {
+      recommendationText = `${selectedTime} is usually very busy. Expect high wait times for ${focus?.label} equipment. Consider going earlier or later.`;
+    } else if (usersAtTime > 50) {
+      recommendationText = `${selectedTime} has moderate traffic. ${focus?.label} equipment should be reasonably available.`;
+    } else {
+      recommendationText = `${selectedTime} is a great time! ${focus?.label} equipment will be mostly free.`;
+    }
+
+    setSuggestion({ selectedTime, eqAvailability, focus, recommendationText, times: [selectedTime] });
   };
 
   const handleComplaintSubmit = (e) => {
@@ -77,9 +101,6 @@ const StudentDashboard = () => {
     setComplaint({ title: '', detail: '', type: 'general' });
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
-    if (isMaintenance) {
-      navigate('/dashboard/staff');
-    }
   };
 
   return (
@@ -181,7 +202,7 @@ const StudentDashboard = () => {
                       : 'border-white/10 bg-white/[0.03] text-muted hover:border-white/20 hover:bg-white/[0.06]'
                   }`}
                 >
-                  <span>{f.icon}</span>
+                  <span className={selectedFocus === f.id ? 'text-accent' : 'text-muted'}><f.icon size={16} /></span>
                   <span className={`text-xs font-medium ${selectedFocus === f.id ? 'text-accent' : 'text-text'}`}>{f.label}</span>
                 </button>
               ))}
@@ -206,17 +227,16 @@ const StudentDashboard = () => {
               exit={{ opacity: 0 }}
               className="mt-5 p-4 rounded-2xl border border-accent/20 bg-accent/5"
             >
-              <p className="text-sm font-semibold text-accent mb-3">
-                ✅ Recommended for {suggestion.focus?.label}
-              </p>
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle2 size={16} className="text-accent" />
+                <p className="text-sm font-semibold text-accent">
+                  Recommended for {suggestion.focus?.label} at {suggestion.selectedTime}
+                </p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-muted mb-2 font-medium uppercase tracking-wide">Best Times to Visit</p>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestion.times.map(t => (
-                      <span key={t} className="text-xs bg-accent/10 text-accent border border-accent/20 px-3 py-1 rounded-full font-semibold">{t}</span>
-                    ))}
-                  </div>
+                  <p className="text-xs text-muted mb-2 font-medium uppercase tracking-wide">AI Recommendation</p>
+                  <p className="text-sm text-text leading-relaxed">{suggestion.recommendationText}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted mb-2 font-medium uppercase tracking-wide">Equipment Availability</p>
@@ -351,8 +371,7 @@ const StudentDashboard = () => {
                   exit={{ opacity: 0 }}
                   className="text-sm text-accent flex items-center gap-1"
                 >
-                  <CheckCircle2 size={14} /> Complaint submitted!
-                  {complaint.type === 'maintenance' && ' Routed to staff.'}
+                  <CheckCircle2 size={14} /> Complaint registered successfully!
                 </motion.span>
               )}
             </AnimatePresence>
@@ -367,7 +386,16 @@ const StudentDashboard = () => {
         {/* Previous complaints */}
         {complaints && complaints.length > 0 && (
           <div className="mt-6 space-y-2">
-            <p className="text-xs text-muted uppercase font-semibold tracking-wide">Your Submissions</p>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-xs text-muted uppercase font-semibold tracking-wide">Your Submissions</p>
+              <button 
+                onClick={clearComplaints}
+                className="p-1.5 text-muted hover:text-accent transition-colors rounded-lg hover:bg-white/5 flex items-center gap-1.5 text-[10px] font-semibold"
+                title="Clear all complaints"
+              >
+                <RotateCw size={12} /> REFRESH
+              </button>
+            </div>
             {complaints.map(c => (
               <div key={c.id} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/5 text-sm">
                 <span className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${c.type === 'maintenance' ? 'bg-warning' : 'bg-accent'}`} />

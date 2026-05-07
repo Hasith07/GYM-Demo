@@ -69,7 +69,7 @@ const LandingPage = () => {
               <Dumbbell size={22} className="text-accent" />
             </div>
             <span className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-accent to-blue-400">
-              GymOS
+              OptiGYM
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-3">
@@ -132,7 +132,7 @@ const LandingPage = () => {
           transition={{ delay: 0.6 }}
           className="text-center text-muted text-xs mt-12"
         >
-          GymOS · Smart Gym Optimization · College Edition 2026
+          OptiGYM · Smart Gym Optimization · College Edition 2026
         </motion.p>
       </div>
     </div>

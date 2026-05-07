@@ -47,7 +47,7 @@ const Sidebar = ({ isMobileOpen, setMobileOpen }) => {
               animate={{ opacity: 1 }} 
               className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-accent to-blue-400"
             >
-              GymOS
+              OptiGYM
             </motion.span>
           )}
         </div>
